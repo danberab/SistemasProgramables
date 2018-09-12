@@ -8,6 +8,13 @@
 #define LedAmarillo2 6
 #define LedRojo2 7
 
+//boton para cambio de vehiculo a peaton
+#define boton1 8
+
+//boton para cambio de peaton a vehiculo
+#define boton2 9
+
+
 
 // Declaracion de variables
 bool activo1 = true; // Si el semáforo 1 está activo = True, de lo contrario será el semáforo 2
@@ -29,6 +36,8 @@ void setup() {
   pinMode(LedAmarillo2, OUTPUT);
   pinMode(LedRojo2, OUTPUT);
 
+  pinMode(boton1, INPUT);
+  pinMode(boton2, INPUT);
 
   // Apagar los leds
   digitalWrite(LedVerde1, LOW);
@@ -41,15 +50,18 @@ void setup() {
   // Inicio con semáforo 1 (vehiculos) paso, semáforo 2 (peatones) alto
   digitalWrite(LedVerde1, HIGH);
   digitalWrite(LedRojo2, HIGH);
+
  
 }
-
 
 void loop() {
   // Verificar semaforo encendido
   if (activo1){
-    int valor2=1;
-    // Si va a cambiar estado apagado a encendido para semaforo 1(vehiculos)
+
+    //Semáforo 1 (vehiculos) encendido, lee estado de boton2
+    int valor2 = digitalRead(boton2);
+
+    // Si va a cambiar estado apagado a encendido para semaforo 1(vehiculos), boton1 presionado
       if (valor2 == HIGH){
 
         // Enciende semáforo 2
@@ -59,8 +71,10 @@ void loop() {
         activo1 = false;
       }
   }else{
-    int valor1= 1;
-    // Cambiar estado semaforo 1 (vehiculos) a encendido
+    // Semáforo 1 (vehiculos) encendido, lee estado boton1
+    int valor1 = digitalRead(boton1);
+
+    // Cambiar estado semaforo 1 (vehiculos) a encendido, boton presionado
     if (valor1 == HIGH){
       
       // Enciende semáforo 1
@@ -71,32 +85,6 @@ void loop() {
     }
   }
   
-}
-
-
-void semaforo1(){
-  // Semáforo 1 apagado y tiempo de espera:
-  delay(tiempoEspera);
-
-  // Sigue luz amarilla
-  digitalWrite(LedVerde2, LOW);
-  digitalWrite(LedAmarillo2, HIGH);
-
-  // Tiempo de espera
-  delay(tiempoCambio);
-
-  // Sigue luz roja
-  digitalWrite(LedAmarillo2, LOW);
-  digitalWrite(LedRojo2, HIGH);
-
-  // Semaforo 1 encendido
-  
-  // Tiempo de espera
-  delay(tiempoCambio);
-
-  // Regresa luz amarilla
-  digitalWrite(LedRojo1, LOW);
-  digitalWrite(LedVerde1, HIGH);
 }
 
 void semaforo2(){
@@ -122,4 +110,29 @@ void semaforo2(){
   // Regresa luz amarilla
   digitalWrite(LedRojo2, LOW);
   digitalWrite(LedVerde2, HIGH);
+}
+
+void semaforo1(){
+  // Semáforo 1 apagado y tiempo de espera:
+  delay(tiempoEspera);
+
+  // Sigue luz amarilla
+  digitalWrite(LedVerde2, LOW);
+  digitalWrite(LedAmarillo2, HIGH);
+
+  // Tiempo de espera
+  delay(tiempoCambio);
+
+  // Sigue luz roja
+  digitalWrite(LedAmarillo2, LOW);
+  digitalWrite(LedRojo2, HIGH);
+
+  // Semaforo 1 encendido
+  
+  // Tiempo de espera
+  delay(tiempoCambio);
+
+  // Regresa luz amarilla
+  digitalWrite(LedRojo1, LOW);
+  digitalWrite(LedVerde1, HIGH);
 }
