@@ -1,138 +1,188 @@
-//Leds para semaforo 1 (vehiculos)
-#define LedVerde1 2
-#define LedAmarillo1 3
-#define LedRojo1 4
+#define ledV1 2
+#define ledA1 3
+#define ledR1 4
+#define ledV2 5
+#define ledA2 6
+#define ledR2 7
+#define potenciometro 3
 
-//Leds para semaforo 2 (peatones)
-#define LedVerde2 5
-#define LedAmarillo2 6
-#define LedRojo2 7
+#define boton1 9
+#define boton2 8
 
-//boton para cambio de vehiculo a peaton
-#define boton1 8
-
-//boton para cambio de peaton a vehiculo
-#define boton2 9
-
-
-
-// Declaracion de variables
-bool activo1 = true; // Si el semáforo 1 está activo = True, de lo contrario será el semáforo 2
-int tiempoCambio = 1500; // Tiempo de espera entre transición de LEDs
-int tiempoEspera = 5000; // Tiempo de espera hasta comenzar transición
+int tpoten = 0;
+bool activo1 = true;
 
 
 void setup() {
   
-  // Se inicia el monitor serie
-  Serial.begin(9600);
+  //Asignacion de pines a los leds
+  pinMode(ledV1, OUTPUT);
+  pinMode(ledA1, OUTPUT);
+  pinMode(ledR1, OUTPUT);
+  pinMode(ledV2, OUTPUT);
+  pinMode(ledA2, OUTPUT);
+  pinMode(ledR2, OUTPUT);
 
-  // Modos de entrada/salida 
-  pinMode(LedVerde1, OUTPUT);
-  pinMode(LedAmarillo1, OUTPUT);
-  pinMode(LedRojo1, OUTPUT);
-
-  pinMode(LedVerde2, OUTPUT);
-  pinMode(LedAmarillo2, OUTPUT);
-  pinMode(LedRojo2, OUTPUT);
-
+  //Asignacion de pines a los botones
   pinMode(boton1, INPUT);
   pinMode(boton2, INPUT);
 
-  // Apagar los leds
-  digitalWrite(LedVerde1, LOW);
-  digitalWrite(LedAmarillo1, LOW);
-  digitalWrite(LedRojo1, LOW);
-  digitalWrite(LedVerde2, LOW);
-  digitalWrite(LedAmarillo2, LOW);
-  digitalWrite(LedRojo2, LOW);
 
-  // Inicio con semáforo 1 (vehiculos) paso, semáforo 2 (peatones) alto
-  digitalWrite(LedVerde1, HIGH);
-  digitalWrite(LedRojo2, HIGH);
+  //Apagado de todos los leds al inicio
+  digitalWrite(ledV1, LOW);
+  digitalWrite(ledA1, LOW);
+  digitalWrite(ledR1, LOW);
+  digitalWrite(ledV2, LOW);
+  digitalWrite(ledA2, LOW);
+  digitalWrite(ledR2, LOW);
 
- 
+  //Comienza con encendido del semaforo 1 (vehiculos) y apagado semaforo 2 (peatones)
+  digitalWrite(ledV1, HIGH);
+  digitalWrite(ledR2, HIGH);
 }
 
 void loop() {
   // Verificar semaforo encendido
-  if (activo1){
+  if(activo1){
 
     //Semáforo 1 (vehiculos) encendido, lee estado de boton2
-    int valor2 = digitalRead(boton2);
-
-    // Si va a cambiar estado apagado a encendido para semaforo 1(vehiculos), boton1 presionado
-      if (valor2 == HIGH){
-
-        // Enciende semáforo 2
-        semaforo2();
-
-        // Semáforo 2 activo
-        activo1 = false;
-      }
+    int valor1 = digitalRead(boton2);
+    
+    // Si va a cambiar estado apagado a encendido para semaforo 2, boton2 presionado
+    if(valor1==1){ 
+      //Enciende semaforo 2
+      serie2();
+      
+      activo1=false;
+    }
   }else{
-    // Semáforo 1 (vehiculos) encendido, lee estado boton1
-    int valor1 = digitalRead(boton1);
+
+    // Semáforo 2 (peatones) encendido, lee estado boton1
+    int valor2 = digitalRead(boton1);
 
     // Cambiar estado semaforo 1 (vehiculos) a encendido, boton presionado
-    if (valor1 == HIGH){
+    if(valor2==1){
+      //Enciende semaforo 2
+      serie1();
       
-      // Enciende semáforo 1
-      semaforo1();
-
-      // Semáforo 1 activo
-      activo1 = true;
+      activo1=true;      
     }
   }
   
 }
 
-void semaforo2(){
-  // Semáforo 1 apagado y tiempo de espera:
-  delay(tiempoEspera);
-
-  // Sigue luz amarilla
-  digitalWrite(LedVerde1, LOW);
-  digitalWrite(LedAmarillo1, HIGH);
-
-  // Tiempo de espera
-  delay(tiempoCambio);
-
-  // Sigue luz roja
-  digitalWrite(LedAmarillo1, LOW);
-  digitalWrite(LedRojo1, HIGH);
-
-  // Semaforo 2 encendido
+void serie1(){ //Vehiculos
   
-  // Tiempo de espera
-  delay(tiempoCambio);
+  //Lee cambio de valor de resistencia del potenciometro
+  tpoten =analogRead(potenciometro);
 
-  // Regresa luz amarilla
-  digitalWrite(LedRojo2, LOW);
-  digitalWrite(LedVerde2, HIGH);
+  //Inicia serie con semaforo 1 en verde y semaforo 2 en rojo
+  digitalWrite(ledV1, HIGH);
+  digitalWrite(ledA1, LOW);
+  digitalWrite(ledR1, LOW);
+  digitalWrite(ledV2, LOW);
+  digitalWrite(ledA2, LOW);
+  digitalWrite(ledR2, HIGH);
+
+  //Tiempo de espera del valor recibido por el potenciometro
+  delay(tpoten);
+  
+  //Lee cambio de valor de resistencia del potenciometro
+  tpoten =analogRead(potenciometro);
+
+  //Serie con semaforo 1 en amarillo y semaforo 2 en rojo
+  digitalWrite(ledV1, LOW);
+  digitalWrite(ledA1, HIGH);
+  digitalWrite(ledR1, LOW);
+  digitalWrite(ledV2, LOW);
+  digitalWrite(ledA2, LOW);
+  digitalWrite(ledR2, HIGH);
+
+  //Tiempo de espera del valor recibido por el potenciometro
+  delay(tpoten);
+  
+  //Lee cambio de valor de resistencia del potenciometro
+  tpoten =analogRead(potenciometro);
+
+  //Serie con semaforo 1 en rojo y semaforo 2 en verde
+  digitalWrite(ledV1, LOW);
+  digitalWrite(ledA1, LOW);
+  digitalWrite(ledR1, HIGH);
+  digitalWrite(ledV2, HIGH);
+  digitalWrite(ledA2, LOW);
+  digitalWrite(ledR2, LOW);
+
+  //Tiempo de espera del valor recibido por el potenciometro
+  delay(tpoten);
+  
+  //Lee cambio de valor de resistencia del potenciometro
+  tpoten =analogRead(potenciometro);
+
+  //Serie con semaforo 1 en rojo y semaforo 2 en amarillo
+  digitalWrite(ledV1, LOW);
+  digitalWrite(ledA1, LOW);
+  digitalWrite(ledR1, HIGH);
+  digitalWrite(ledV2, LOW);
+  digitalWrite(ledA2, HIGH);
+  digitalWrite(ledR2, LOW);
+
+ 
 }
 
-void semaforo1(){
-  // Semáforo 1 apagado y tiempo de espera:
-  delay(tiempoEspera);
+void serie2(){ //Peatones
 
-  // Sigue luz amarilla
-  digitalWrite(LedVerde2, LOW);
-  digitalWrite(LedAmarillo2, HIGH);
+  //Lee cambio de valor de resistencia del potenciometro
+  tpoten =analogRead(potenciometro);
 
-  // Tiempo de espera
-  delay(tiempoCambio);
+  //Inicia serie con semaforo 1 en rojo y semaforo 2 en verde
+  digitalWrite(ledV1, LOW);
+  digitalWrite(ledA1, LOW);
+  digitalWrite(ledR1, HIGH);
+  digitalWrite(ledV2, HIGH);
+  digitalWrite(ledA2, LOW);
+  digitalWrite(ledR2, LOW);
 
-  // Sigue luz roja
-  digitalWrite(LedAmarillo2, LOW);
-  digitalWrite(LedRojo2, HIGH);
-
-  // Semaforo 1 encendido
+  //Tiempo de espera del valor recibido por el potenciometro
+  delay(tpoten);
   
-  // Tiempo de espera
-  delay(tiempoCambio);
+  //Lee cambio de valor de resistencia del potenciometro
+  tpoten =analogRead(potenciometro);
 
-  // Regresa luz amarilla
-  digitalWrite(LedRojo1, LOW);
-  digitalWrite(LedVerde1, HIGH);
+  //Serie con semaforo 1 en rojo y semaforo 2 en amarillo
+  digitalWrite(ledV1, LOW);
+  digitalWrite(ledA1, LOW);
+  digitalWrite(ledR1, HIGH);
+  digitalWrite(ledV2, LOW);
+  digitalWrite(ledA2, HIGH);
+  digitalWrite(ledR2, LOW);
+
+  //Tiempo de espera del valor recibido por el potenciometro
+  delay(tpoten);
+  
+  //Lee cambio de valor de resistencia del potenciometro
+  tpoten =analogRead(potenciometro);
+
+  //Serie con semaforo 1 en verde y semaforo 2 en rojo
+  digitalWrite(ledV1, HIGH);
+  digitalWrite(ledA1, LOW);
+  digitalWrite(ledR1, LOW);
+  digitalWrite(ledV2, LOW);
+  digitalWrite(ledA2, LOW);
+  digitalWrite(ledR2, HIGH);
+
+  //Tiempo de espera del valor recibido por el potenciometro
+  delay(tpoten);
+  
+  //Lee cambio de valor de resistencia del potenciometro
+  tpoten =analogRead(potenciometro);
+
+  //Serie con semaforo 1 en amarillo y semaforo 2 en rojo
+  digitalWrite(ledV1, LOW);
+  digitalWrite(ledA1, HIGH);
+  digitalWrite(ledR1, LOW);
+  digitalWrite(ledV2, LOW);
+  digitalWrite(ledA2, LOW);
+  digitalWrite(ledR2, HIGH);
+
+ 
 }
